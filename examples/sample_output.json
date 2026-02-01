@@ -1,0 +1,29 @@
+{
+  "run_id": "2026-02-01T12:00:00Z",
+  "scope": {"regions": ["UK", "EU"], "topic": "global trade challenges", "languages": ["en"]},
+  "items": [
+    {
+      "title": "CBAM compliance costs for UK exporters",
+      "summary": "EU CBAM rules increase reporting and compliance costs for UK exporters of carbon-intensive goods. Firms must track embedded emissions and prepare for potential charges.",
+      "challenge_type": "ESG/CBAM",
+      "impact_area": ["exports"],
+      "severity": "medium",
+      "time_horizon": "3-12m",
+      "uk_relevance": "direct",
+      "eu_relevance": "direct",
+      "affected_sectors": ["steel", "chemicals"],
+      "evidence": [
+        {
+          "source_name": "ec.europa.eu",
+          "url": "https://ec.europa.eu/example",
+          "published_at": null,
+          "quote": "CBAM reporting required for imports.",
+          "credibility": "high"
+        }
+      ],
+      "confidence": 0.72,
+      "dedupe_key": "2f0c1a0b9d1f3a2c"
+    }
+  ],
+  "stats": {"found": 3, "kept": 1, "duplicates_removed": 2}
+}

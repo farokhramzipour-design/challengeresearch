@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: trade
+      POSTGRES_PASSWORD: trade
+      POSTGRES_DB: trade_challenges
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://trade:trade@db:5432/trade_challenges
+      SEARCH_PROVIDER: ${SEARCH_PROVIDER:-bing}
+      AZURE_BING_KEY: ${AZURE_BING_KEY}
+      AZURE_BING_ENDPOINT: ${AZURE_BING_ENDPOINT:-https://api.bing.microsoft.com/v7.0/search}
+      SERPAPI_KEY: ${SERPAPI_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
