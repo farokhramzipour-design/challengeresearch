@@ -81,6 +81,36 @@ Notes:
 - Consider placing a reverse proxy (nginx/Caddy) in front of the app for TLS.
 - Use a managed Postgres in production and update `DATABASE_URL` accordingly.
 
+### Reverse Proxy (TLS)
+
+Example Nginx config (replace domain and certificate paths):
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Example Caddyfile:
+
+```
+yourdomain.com {
+    reverse_proxy 127.0.0.1:8000
+}
+```
+
 ## API Endpoints
 
 - `POST /runs` start a run
