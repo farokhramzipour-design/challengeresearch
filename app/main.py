@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict
 
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -167,3 +167,14 @@ def get_challenges(run_id: str, db: Session = Depends(get_session)):
         "stats": run.stats or {},
     }
     return OutputSchema.model_validate(output)
+
+
+@app.get("/runs/success/challenges")
+def list_success_challenges(request: Request, db: Session = Depends(get_session)) -> Dict[str, list[dict]]:
+    runs = db.query(Run).filter(Run.status == "completed").all()
+    base = str(request.base_url).rstrip("/")
+    return {
+        "items": [
+            {"run_id": run.id, "url": f"{base}/runs/{run.id}/challenges"} for run in runs
+        ]
+    }
