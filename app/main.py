@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -21,6 +22,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("trade-challenges")
 
 app = FastAPI(title="Trade Challenges Research Agent")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://veritariffai.co", "https://www.veritariffai.co"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
