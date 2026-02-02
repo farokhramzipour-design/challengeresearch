@@ -130,6 +130,14 @@ def run_pipeline(run_id: str, params: Dict[str, Any]) -> tuple[OutputSchema, Lis
     synthesized = llm.synthesize(candidate_blob)
     items = synthesized.get("items", [])
 
+    valid_impact = {"imports", "exports", "transit", "services_trade", "manufacturing"}
+    impact_map = {
+        "supplychain": "manufacturing",
+        "supply_chain": "manufacturing",
+        "supplychainrisk": "manufacturing",
+        "supply_chain_risk": "manufacturing",
+    }
+
     valid_sectors = {
         "automotive",
         "agri-food",
@@ -150,6 +158,14 @@ def run_pipeline(run_id: str, params: Dict[str, Any]) -> tuple[OutputSchema, Lis
     }
 
     for item in items:
+        impacts = [str(i).strip().lower() for i in item.get("impact_area", [])]
+        normalized_impacts = []
+        for imp in impacts:
+            imp = impact_map.get(imp, imp)
+            if imp in valid_impact:
+                normalized_impacts.append(imp)
+        item["impact_area"] = sorted(set(normalized_impacts)) or ["imports"]
+
         sectors = [str(s).strip().lower() for s in item.get("affected_sectors", [])]
         normalized = []
         for s in sectors:
