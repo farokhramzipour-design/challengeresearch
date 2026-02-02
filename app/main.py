@@ -31,7 +31,7 @@ def on_startup() -> None:
 
 def _save_output(run_id: str, output: Dict) -> None:
     root = run_dir(run_id)
-    (root / "output.json").write_text(json.dumps(output, indent=2), encoding="utf-8")
+    (root / "output.json").write_text(json.dumps(output, indent=2, default=str), encoding="utf-8")
     (root / "report.md").write_text(to_markdown(output), encoding="utf-8")
 
 
@@ -88,7 +88,7 @@ def _run_job(run_id: str, params: Dict) -> None:
         db.commit()
 
         _store_output(db, run_id, output, sources)
-        _save_output(run_id, output.model_dump())
+        _save_output(run_id, output.model_dump(mode="json"))
     except Exception as exc:
         run = db.get(Run, run_id)
         if run:
