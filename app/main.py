@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import logging
+import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Dict
@@ -14,6 +16,9 @@ from app.models.schemas import OutputSchema, RunConfig, RunCreateResponse, RunSt
 from app.services.cache import run_dir
 from app.services.pipeline import run_pipeline
 from app.services.report import to_markdown
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("trade-challenges")
 
 app = FastAPI(title="Trade Challenges Research Agent")
 
@@ -89,6 +94,8 @@ def _run_job(run_id: str, params: Dict) -> None:
             run.status = "failed"
             run.error = str(exc)
             db.commit()
+        logger.error("Run %s failed: %s", run_id, exc)
+        logger.error(traceback.format_exc())
     finally:
         db.close()
 
