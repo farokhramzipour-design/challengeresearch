@@ -100,7 +100,23 @@ class OpenAIClient:
         try:
             return response.output[0].content[0].text
         except Exception:
-            return ""
+            try:
+                return response.choices[0].message.content
+            except Exception:
+                return ""
+
+    def _create_response(self, prompt: str) -> Any:
+        if hasattr(self.client, "responses"):
+            return self.client.responses.create(
+                model=settings.openai_model,
+                input=prompt,
+                temperature=0,
+            )
+        return self.client.chat.completions.create(
+            model=settings.openai_model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+        )
 
     @retry(stop=stop_after_attempt(settings.max_retries), wait=wait_exponential(min=1, max=10))
     def extract_candidates(self, text: str, url: str, title: str, published_at: Optional[str]) -> Dict[str, Any]:
@@ -108,22 +124,14 @@ class OpenAIClient:
             "{{PUBLISHED_AT_OR_NULL}}", published_at or "null"
         ).replace("{{ARTICLE_TEXT}}", text)
 
-        response = self.client.responses.create(
-            model=settings.openai_model,
-            input=prompt,
-            temperature=0,
-        )
+        response = self._create_response(prompt)
         raw = self._extract_text(response)
         return self._load_json(raw)
 
     @retry(stop=stop_after_attempt(settings.max_retries), wait=wait_exponential(min=1, max=10))
     def synthesize(self, candidates_json: Dict[str, Any]) -> Dict[str, Any]:
         prompt = SYNTHESIS_PROMPT.replace("{{CANDIDATES_JSON}}", json.dumps(candidates_json, ensure_ascii=True))
-        response = self.client.responses.create(
-            model=settings.openai_model,
-            input=prompt,
-            temperature=0,
-        )
+        response = self._create_response(prompt)
         raw = self._extract_text(response)
         return self._load_json(raw)
 
@@ -140,9 +148,5 @@ class OpenAIClient:
             return json.loads(raw)
         except json.JSONDecodeError:
             fix_prompt = f"Return ONLY valid JSON. Fix this:\n{raw}"
-            response = self.client.responses.create(
-                model=settings.openai_model,
-                input=fix_prompt,
-                temperature=0,
-            )
+            response = self._create_response(fix_prompt)
             return json.loads(self._extract_text(response))
