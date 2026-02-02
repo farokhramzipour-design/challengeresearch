@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     openai_embedding_model: str = Field(default="text-embedding-3-small", alias="OPENAI_EMBEDDING_MODEL")
 
     # Search providers
-    search_provider: Literal["bing", "serpapi"] = Field(default="bing", alias="SEARCH_PROVIDER")
+    search_provider: Literal["bing", "serpapi"] = Field(default="serpapi", alias="SEARCH_PROVIDER")
     azure_bing_key: Optional[str] = Field(default=None, alias="AZURE_BING_KEY")
     azure_bing_endpoint: str = Field(default="https://api.bing.microsoft.com/v7.0/search", alias="AZURE_BING_ENDPOINT")
     serpapi_key: Optional[str] = Field(default=None, alias="SERPAPI_KEY")

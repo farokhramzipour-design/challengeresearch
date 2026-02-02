@@ -58,7 +58,10 @@ def _metadata_from_html(html: Optional[str]) -> Dict[str, Optional[str]]:
 def _make_search_client():
     if settings.search_provider == "serpapi":
         return SerpAPISearchClient()
-    return BingSearchClient()
+    try:
+        return BingSearchClient()
+    except ValueError:
+        return SerpAPISearchClient()
 
 
 def run_pipeline(run_id: str, params: Dict[str, Any]) -> tuple[OutputSchema, List[Dict[str, Any]]]:
