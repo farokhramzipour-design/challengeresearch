@@ -130,6 +130,34 @@ def run_pipeline(run_id: str, params: Dict[str, Any]) -> tuple[OutputSchema, Lis
     synthesized = llm.synthesize(candidate_blob)
     items = synthesized.get("items", [])
 
+    valid_sectors = {
+        "automotive",
+        "agri-food",
+        "steel",
+        "chemicals",
+        "pharma",
+        "electronics",
+        "energy",
+        "shipping",
+        "retail",
+        "other",
+    }
+    sector_map = {
+        "manufacturing": "other",
+        "finance": "other",
+        "services": "other",
+        "tech": "other",
+    }
+
+    for item in items:
+        sectors = [str(s).strip().lower() for s in item.get("affected_sectors", [])]
+        normalized = []
+        for s in sectors:
+            s = sector_map.get(s, s)
+            if s in valid_sectors:
+                normalized.append(s)
+        item["affected_sectors"] = sorted(set(normalized)) or ["other"]
+
     # Apply deterministic dedupe on top of synthesis
     texts = [f"{item.get('title','')} {item.get('summary','')}" for item in items]
     embeddings = llm.embed_texts(texts) if texts else []
