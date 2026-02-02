@@ -50,6 +50,7 @@ def _store_output(db: Session, run_id: str, output: OutputSchema, sources: list[
         )
 
     for item in output.items:
+        evidence_json = [ev.model_dump(mode="json") for ev in item.evidence]
         db.add(
             Challenge(
                 run_id=run_id,
@@ -62,7 +63,7 @@ def _store_output(db: Session, run_id: str, output: OutputSchema, sources: list[
                 uk_relevance=item.uk_relevance,
                 eu_relevance=item.eu_relevance,
                 affected_sectors=item.affected_sectors,
-                evidence=[ev.model_dump() for ev in item.evidence],
+                evidence=evidence_json,
                 confidence=item.confidence,
                 dedupe_key=item.dedupe_key,
             )
